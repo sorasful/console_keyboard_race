@@ -1,0 +1,15 @@
+Mode solo :
+
+Methods :
+- Create menu
+- Get key pressed(): string
+
+- Clean screen console (refresh)() : void
+- Create timer : float
+- Count fails stokes : int
+- calcul speed : float
+- Get random text() : string
+- Find a api
+- Color actual text
+- Format text
+- Start again press any key 
