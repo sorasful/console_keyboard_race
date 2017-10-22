@@ -7,7 +7,6 @@ class Race(object):
         Represents a race with a text, speed, etc ...
     """
     actual_text = ""
-    speed = None  # = len(final_text) / time
     wrongs = 0
     start_time = None
 
@@ -39,3 +38,16 @@ class Race(object):
             else:
                 self.wrongs += 1
 
+
+    def get_statistics(self):
+        """
+        Speed / Wrongs / Fatests stroke / most missed stokes /time
+        :return:
+        """
+        speed = len(self.final_text) / self.full_time
+
+        return {
+            "speed":speed,
+            "wrongs" : self.wrongs,
+            "time": self.full_time
+        }
