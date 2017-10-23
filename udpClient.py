@@ -36,8 +36,8 @@ def chat():
 
 def race_opponent():
     text = ""
-    my_race = None
-    opponent_race = None
+    my_race = Race(text)
+    opponent_race = Race(text)
     compteur = 0  # To check if it's the first connection or not
 
     host = "127.0.0.1"
@@ -75,17 +75,35 @@ def race_opponent():
         thread = MyThread(stopFlag)
         thread.start()
 
-
         if compteur == 0: #If this is the first connection
             s.sendto("new_connection".encode(), server)
             data, addr = s.recvfrom(1024)
             text = str(data.decode())
+            print("Connection successful ! Game will begin in 5 seconds.")
+            print("Text : \n{0}".format(text))
             my_race = Race(text)
             opponent_race = Race(text)
-            print("First connection. Text received :" + text)
+            time.sleep(5)
+            menus.clean_screen()
+            my_race.start_time = time.time()
+            opponent_race.start_time = time.time()
+            print("GO !")
 
 
         else:
+
+            if my_race.check_if_game_is_won():
+                menus.clean_screen()
+                print("YOU WON !")
+                menus.show_statistics(my_race.get_statistics())
+                break
+
+            if opponent_race.check_if_game_is_won():
+                menus.clean_screen()
+                print("YOU LOSE !")
+                menus.show_statistics(my_race.get_statistics())
+                break
+
             key = utils.getKey()
             menus.clean_screen()
             utils.get_input_and_print_actual_text(key=key, race=my_race, color="green")

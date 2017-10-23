@@ -79,12 +79,30 @@ def race_opponent():
         thread.start()
 
 
+
         if compteur == 0:
             data, addr = s.recvfrom(1024)
+            print("Player found ! Game will begin in 5 seconds ...")
+            print("Text : \n{0}".format(TEXT))
             s.sendto(TEXT.encode(), addr)
-
+            time.sleep(5)
+            menus.clean_screen()
+            my_race.start_time = time.time()
+            print("GO !")
 
         else:
+            if my_race.check_if_game_is_won():
+                menus.clean_screen()
+                print("YOU WON !")
+                menus.show_statistics(my_race.get_statistics())
+                break
+
+            if opponent_race.check_if_game_is_won():
+                menus.clean_screen()
+                print("YOU LOSE !")
+                menus.show_statistics(my_race.get_statistics())
+                break
+
             key = utils.getKey()
             menus.clean_screen()
             utils.get_input_and_print_actual_text(key=key, race=my_race, color="green")
