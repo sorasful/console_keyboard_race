@@ -8,14 +8,14 @@ class Race(object):
     """
     actual_text = ""
     wrongs = 0
-    start_time = None
 
     def __init__(self, text):
         self.final_text = text
 
+    def start_race(self):
+        self.start_time = time.time()
 
-
-    def check_if_win(self):
+    def check_if_game_is_won(self):
         if self.actual_text == self.final_text:
             self.end_time = time.time()
             self.full_time = self.end_time - self.start_time
@@ -24,8 +24,6 @@ class Race(object):
             return True
 
     def check_key_pressed(self, key_pressed):
-        print("key pressed :", key_pressed)
-
         if self.actual_text:
             if key_pressed == self.final_text.split(self.actual_text)[1][0]: #lettre suivante
                 self.actual_text += key_pressed
@@ -41,7 +39,7 @@ class Race(object):
 
     def get_statistics(self):
         """
-        Speed / Wrongs / Fatests stroke / most missed stokes /time
+        TODO Speed / Wrongs / Fatests stroke / most missed stokes /time
         :return:
         """
         speed = len(self.final_text) / self.full_time
@@ -51,3 +49,5 @@ class Race(object):
             "wrongs" : self.wrongs,
             "time": self.full_time
         }
+
+    #TODO : implements other stats

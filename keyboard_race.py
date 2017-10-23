@@ -11,6 +11,5 @@ def main():
     menus.main_game_menu()
 
 
-
 if __name__ == "__main__":
     main()

@@ -58,3 +58,5 @@ def color_typed_text(final_text, actual_text):
         return termcolor.colored(actual_text, "red") + tmp[1]
     else:
         return final_text
+
+#TODO: Save scores
