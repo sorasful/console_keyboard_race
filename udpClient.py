@@ -1,6 +1,14 @@
 import socket
+
+import time
+
+import os
+
+import menus
 import utils
 from race import Race
+
+import threading
 
 
 def chat():
@@ -33,7 +41,8 @@ def race_opponent():
     compteur = 0  # To check if it's the first connection or not
 
     host = "127.0.0.1"
-    port = 5001
+    port = 5001 # Must be different from server
+    addr = None
 
     server = ("127.0.0.1", 5000)
 
@@ -41,29 +50,50 @@ def race_opponent():
     s.bind((host, port))
 
     while True:
-        print("1")
+
+        class MyThread(threading.Thread):
+
+            def receive(self):
+                threading.Timer(1, self.receive).start()
+                data, addr = s.recvfrom(1024)
+                if len(data) > 0:
+                    opponent_race.actual_text = str(data.decode())
+
+            def __init__(self, event):
+                threading.Thread.__init__(self)
+                self.stopped = event
+
+            def run(self):
+                while not self.stopped.wait(1):
+                    self.receive()
+                    # call a function
+
+                    time.sleep(20)
+                    stopFlag.set()
+
+        stopFlag = threading.Event()
+        thread = MyThread(stopFlag)
+        thread.start()
+
+
         if compteur == 0: #If this is the first connection
             s.sendto("new_connection".encode(), server)
             data, addr = s.recvfrom(1024)
             text = str(data.decode())
-            race = Race(text)
+            my_race = Race(text)
+            opponent_race = Race(text)
             print("First connection. Text received :" + text)
 
-        print("2")
-        #data, addr = s.recvfrom(1024)
-        print("3")
-        message = utils.getKey()
-        print("4")
 
-        if message == "exit":
-            s.sendto(message.encode(), server)
-            # Dont' wait for answer
-            break
+        else:
+            key = utils.getKey()
+            menus.clean_screen()
+            utils.get_input_and_print_actual_text(key=key, race=my_race, color="green")
+            s.sendto(my_race.actual_text.encode(), server)
+            utils.check_input_and_print_actual_text(opponent_race.actual_text, opponent_race)
 
-        s.sendto(message.encode(), server)
-        print("5")
+
         compteur += 1
-        print("6")
 
     s.close()
 

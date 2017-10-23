@@ -1,7 +1,14 @@
 import socket
+
+import time
+
+import os
+
 import menus
 from race import Race
 import utils
+
+import threading
 
 def chat():
     host = "127.0.0.1"
@@ -26,57 +33,65 @@ def chat():
     s.close()
 
 
+
+
+
 def race_opponent():
 
     TEXT = "Ceci est le texte de course."
     my_race = Race(TEXT)
     opponent_race = Race(TEXT)
-
     compteur = 0 # To check if it's the first connection or not
 
     # Host screen for race
     host = "127.0.0.1"
     port = 5000
+    addr = None
 
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # DGRAM for udp
     s.bind((host, port))
 
     print("Waiting for your opponent ...\n")
     while True:
-        print("1")
-        data, addr = s.recvfrom(1024)
-        str_data = data.decode()
-        print("2")
-        # Client is connected
-        # We send the text to the client
-        if str_data == "new_connection": # If this is the first connection:
-            print("3")
+
+        class MyThread(threading.Thread):
+
+            def receive(self):
+                threading.Timer(1, self.receive).start()
+                data, addr = s.recvfrom(1024)
+                if len(data.decode()) > 0:
+                    opponent_race.actual_text = str(data.decode())
+
+            def __init__(self, event):
+                threading.Thread.__init__(self)
+                self.stopped = event
+
+            def run(self):
+                while not self.stopped.wait(1):
+                    self.receive()
+                    # call a function
+
+                    time.sleep(20)
+                    stopFlag.set()
+
+        stopFlag = threading.Event()
+        thread = MyThread(stopFlag)
+        thread.start()
+
+
+        if compteur == 0:
+            data, addr = s.recvfrom(1024)
             s.sendto(TEXT.encode(), addr)
-            print("4")
+
 
         else:
-            print("5")
-            utils.get_input_and_print_actual_text(my_race, color="green")
-
-            utils.check_input_and_print_actual_text(str_data, opponent_race)
-            print("6")
-
-            # print("{0}\t -> Me".format(utils.color_typed_text(final_text=my_race.final_text, actual_text=my_race.actual_text,
-            #                                                   color="green")))
-            # print("{0}\t -> Opponent".format(utils.color_typed_text(final_text=opponent_race.final_text,
-            #                                                         actual_text=opponent_race.actual_text)))
-        # menus.clean_screen()
-
-        if str(data.decode()) == 'exit':
-            break
+            key = utils.getKey()
+            menus.clean_screen()
+            utils.get_input_and_print_actual_text(key=key, race=my_race, color="green")
+            s.sendto(my_race.actual_text.encode(), addr)
+            utils.check_input_and_print_actual_text(opponent_race.actual_text, opponent_race)
 
         compteur += 1
-        print("7")
-
-
-            # data = str(data.decode()).upper().encode()
-        # print("Sending after treatment...")
-        # s.sendto(data, addr)
 
     s.close()
 

@@ -49,9 +49,10 @@ def getKey():
         termios.tcsetattr(fd, termios.TCSAFLUSH, old)
     return key.decode()
 
-def get_input_and_print_actual_text(race, color):
-    first_stroke = getKey()
-    race.check_key_pressed(key_pressed=first_stroke)
+def get_input_and_print_actual_text(race, color, key=None):
+    if not key:
+        key = getKey()
+    race.check_key_pressed(key_pressed=key)
     print(color_typed_text(final_text=race.final_text, actual_text=race.actual_text, color=color))
 
 
