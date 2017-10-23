@@ -5,6 +5,8 @@ import time
 import utils
 from race import Race
 import sys
+import udpServer
+import udpClient
 
 
 def change_menu(choices_dict):
@@ -21,17 +23,11 @@ def welcome_menu():
     change_menu({"1": solo_game, "2": multi_main_menu})
 
 
-def get_input_and_print_actual_text(race):
-    first_stroke = utils.getKey()
-    race.check_key_pressed(key_pressed=first_stroke)
-    clean_screen()
-    print(utils.color_typed_text(final_text=race.final_text, actual_text=race.actual_text))
-
 
 def solo_game():
     race = Race(utils.get_random_text())
     print(race.final_text, "\nPress a key to begin...")
-    get_input_and_print_actual_text(race)
+    utils.get_input_and_print_actual_text(race)
     race.start_race()
     while True:
         if race.check_if_game_is_won():
@@ -45,7 +41,7 @@ def solo_game():
             change_menu({"r": solo_game, "m": welcome_menu, "q": leave})
             break
 
-        get_input_and_print_actual_text(race)
+        utils.get_input_and_print_actual_text(race)
 
 
 def multi_main_menu():
@@ -57,12 +53,11 @@ def multi_main_menu():
 
 
 def host_screen():
-    print("Waiting for connection ...")
-    raise NotImplementedError
+    udpServer.race_opponent()
 
 def join_screen():
-    server_ip = input("Enter server ip: ")
-    raise NotImplementedError
+    server_ip = input("Enter server ip: (This is not used yet) ")
+    udpClient.race_opponent()
 
 def leave():
     sys.exit()

@@ -49,13 +49,22 @@ def getKey():
         termios.tcsetattr(fd, termios.TCSAFLUSH, old)
     return key.decode()
 
+def get_input_and_print_actual_text(race, color):
+    first_stroke = getKey()
+    race.check_key_pressed(key_pressed=first_stroke)
+    print(color_typed_text(final_text=race.final_text, actual_text=race.actual_text, color=color))
+
+
+def check_input_and_print_actual_text(key,race):
+    race.check_key_pressed(key_pressed=key)
+    print(color_typed_text(final_text=race.final_text, actual_text=race.actual_text))
 
 
 # Colores the typed text in red and the rest in black
-def color_typed_text(final_text, actual_text):
+def color_typed_text(final_text, actual_text, color="red"):
     if actual_text:
         tmp = final_text.split(actual_text)
-        return termcolor.colored(actual_text, "red") + tmp[1]
+        return termcolor.colored(actual_text, color) + tmp[1]
     else:
         return final_text
 
