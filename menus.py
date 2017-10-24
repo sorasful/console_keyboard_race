@@ -13,7 +13,7 @@ def change_menu(choices_dict):
     key = utils.getKey()
     menu = choices_dict.get(key)
     if menu:
-        clean_screen()
+        utils.clean_screen()
         menu()
 
 
@@ -23,14 +23,13 @@ def welcome_menu():
     change_menu({"1": solo_game, "2": multi_main_menu})
 
 
-
 def solo_game():
     race = Race(utils.get_random_text())
     print(race.final_text, "\nPress a key to begin...")
-    utils.get_input_and_print_actual_text(race)
+    utils.get_input_and_print_actual_text(race, color="green")
     race.start_race()
     while True:
-        if race.check_if_game_is_won():
+        if race.check_if_finished():
             print("You won !")
             show_statistics(race.get_statistics())
             print("""
@@ -40,8 +39,7 @@ def solo_game():
 
             change_menu({"r": solo_game, "m": welcome_menu, "q": leave})
             break
-
-        utils.get_input_and_print_actual_text(race)
+        utils.get_input_and_print_actual_text(race, color="green")
 
 
 def multi_main_menu():
@@ -49,15 +47,17 @@ def multi_main_menu():
     1. Host
     2. Join a server""")
 
-    change_menu({"1": host_screen, "2": join_screen })
+    change_menu({"1": host_screen, "2": join_screen})
 
 
 def host_screen():
     udpServer.race_opponent()
 
+
 def join_screen():
     server_ip = input("Enter server ip: (This is not used yet) ")
     udpClient.race_opponent()
+
 
 def leave():
     sys.exit()
@@ -73,10 +73,6 @@ def multi_score_menu():
 
 def print_porcentage(final_text, actual_text):
     return (len(actual_text) / len(final_text)) * 100
-
-
-def clean_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def show_statistics(statistics):

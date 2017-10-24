@@ -7,6 +7,8 @@ import tty
 
 import termcolor
 
+import requests
+
 __fd = sys.stdin.fileno()
 __old = termios.tcgetattr(__fd)
 
@@ -22,12 +24,10 @@ def __getKey():
         termios.tcsetattr(__fd, termios.TCSADRAIN, __old)
 
 
-
 def get_random_text():
-    #TODO : Replace with a real random text
-    return "Ceci est un test !"
-
-
+    # TODO : Replace with a real random text
+    return requests.get(
+        "http://api.icndb.com/jokes/random").json()["value"]["joke"]
 
 
 def getKey():
@@ -49,16 +49,17 @@ def getKey():
         termios.tcsetattr(fd, termios.TCSAFLUSH, old)
     return key.decode()
 
+
 def get_input_and_print_actual_text(race, color, key=None):
     if not key:
         key = getKey()
     race.check_key_pressed(key_pressed=key)
-    print(color_typed_text(final_text=race.final_text, actual_text=race.actual_text, color=color))
-
-
-def check_input_and_print_actual_text(key,race):
-    race.check_key_pressed(key_pressed=key)
-    print(color_typed_text(final_text=race.final_text, actual_text=race.actual_text))
+    clean_screen()
+    print(
+        color_typed_text(
+            final_text=race.final_text,
+            actual_text=race.actual_text,
+            color=color))
 
 
 # Colores the typed text in red and the rest in black
@@ -69,4 +70,8 @@ def color_typed_text(final_text, actual_text, color="red"):
     else:
         return final_text
 
-#TODO: Save scores
+# TODO: Save scores
+
+
+def clean_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
